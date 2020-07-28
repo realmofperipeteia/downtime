@@ -11,4 +11,4 @@
 
 -title "**Downtime Activity: Rest**" 
 -desc "{{hMsg if h else ndMsg if nd else sMsg}}"
--footer "Downtime | Rest | ShadowPrince#8900"
+-footer "Downtime | Rest | Peripéteia"
