@@ -27,6 +27,6 @@ hMsg=f' -desc"**HELP**\n\nPlease check downtime rules to set counters!"'
 return hMsg if h else ndMsg if nd else sMsg
 </drac2>
 -title "**<name>** begins combat training!"
--footer "Downtime | Training | ShadowPrince#8900"
+-footer "Downtime | Training | Peripéteia"
 -thumb <image>
 -color <color>
