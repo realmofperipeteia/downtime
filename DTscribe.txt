@@ -1,0 +1,35 @@
+!alias DTscribe embed
+<drac2>
+h,nd='%1%'.lower()=='help',get_cc('DT')==0
+mod_cc('DT', -1) if not (nd or h) else None
+args=&ARGS&
+
+b=proficiencyBonus if "Calligrapher's Supplies" in get("pTools","[]") else 0
+mod=intelligenceMod+roll('1d20')
+one=mod + b
+two=get('intelligenceSave')+roll('1d20')
+dc=8
+
+suc=(0 if dc > one else 1)+(0 if dc > two else 1)
+rew=2+proficiencyBonus if suc==2 else proficiencyBonus
+
+total=0 if suc==0 else rew
+
+a = load_json(bags)
+[a[x][1].update({"gp":a[x][1].gp+total}) for x in range(len(a)) if a[x][0] == 'Coin Pouch'][0]
+set_cvar("bags",dump_json(a))
+
+n = "\n"
+
+sMsg=f' -desc "You write down detailed pages and maps! (DC {dc})\n**Intelligence:** {one}\n\nYou power through the work with mental fortitude! (DC {dc})\n**Intelligence Save:** {two}\n\n{"**Success!** Everyone is happy with your service!" + n + "You gain **" + str(total) + "gp**" if suc==2 else "You are able to make it through the day." + n + "You gain **" + str(total) + "gp**" if suc==1 else "You **failed** and the work was not completed!"}\n\n**DT Remaining:** "{cc_str("DT")}'
+
+ndMsg=f' -desc "{name} does not have the required downtime to perform this work."'
+
+hMsg=f' -desc "**HELP**\n\nPlease check downtime rules to set counters!"'
+
+return hMsg if h else ndMsg if nd else sMsg
+</drac2>
+-title "**<name>** starts their job as a Scribe!"
+-footer "Downtime | Scribe Work | Shadowprince#8900"
+-thumb <image>
+-color <color>

@@ -1,0 +1,55 @@
+!servalias DTspell embed
+<drac2>
+args,n,eM = &ARGS&,"\n",f' -desc "Command not entered correctly.\nPlease type `!DTspell [copy/transcribe] [level]`"'
+
+if len(&ARGS&) < 2:
+    v1,v2 = '',''
+    return eM
+else:
+    None
+
+if "&2&".isdigit():
+  slevel = int("&2&")
+else:
+    v1,v2 = '',''
+    return eM
+
+DC = 10 + slevel
+one = get_raw().skills.arcana+roll('1d20')
+S = 1 if DC > one else 2
+
+if '&1&'.lower()=='copy':
+    v1,v2,v3 = 'Copy','copying','copied'
+    cost = 50
+elif '&1&'.lower()=='transcribe':
+    v1,v2,v3 = 'Transcribe','transcribing','transcribed'
+    cost = 10
+else:
+    v1,v2 = '',''
+    return eM
+
+if cc_exists('Spell'):
+    limit = get_cc_max('Spell')
+else:
+    create_cc('Spell',0,slevel*2)
+    set_cc("Spell",0)
+    limit = get_cc_max('Spell')
+
+if get_cc('DT')==0:
+    Msg = f' -desc "{name} does not have the required downtime to perform this work."'
+else:
+    a = load_json(bags)
+    [a[x][1].update({"gp":a[x][1].gp-cost}) for x in range(len(a)) if a[x][0] == 'Coin Pouch'][0]
+    set_cvar("bags",dump_json(a))
+    money = [a[x][1].get("gp") for x in range(len(a)) if a[x][0] == 'Coin Pouch'][0]
+    mod_cc('DT', -1) 
+    mod_cc('Spell', +S)
+    C = 1 if get_cc('Spell')==limit else 2
+    Msg=f' -desc "You dabble in the mystical arts of magic! (DC {DC})\n**Arcana:** {one}\n\n{"**Success!**" + n + "You gain **" + str(S) + "** progress points." if S==2 else "Progress is slow." + n + "You gain **" + str(S) + "** progress point."}\n\n{"Congratulations you have " + v3 + " a **level " + str(slevel) + "** spell!" if C==1 else "**Progress:** " + cc_str("Spell")}\n\n**Gold Remaining:** {money}gp\n**DT Remaining:** {cc_str("DT")}"'
+    delete_cc('Spell') if C==1 else mod_cc('Spell', +0)
+return Msg
+</drac2>
+-title "**<name>** begins {{v2}} spells!"
+-footer "Downtime | Spell {{v1}} | Peripéteia"
+-thumb <image>
+-color <color>

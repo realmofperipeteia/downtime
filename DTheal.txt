@@ -1,0 +1,39 @@
+!alias DTheal embed
+<drac2>
+h,nd='%1%'.lower()=='help',get_cc('DT')==0
+mod_cc('DT', -1) if not (nd or h) else None
+args=&ARGS&
+
+b=proficiencyBonus if "Herbalism Kit" in get("pTools","[]") else 0
+mod=get_raw().skills.medicine+roll('1d20')
+one=mod + b
+two=get('constitutionSave')+roll('1d20')
+dc1=roll('2d4+7')
+dc2=roll('2d4+7')
+
+suc=0 if dc1 > one else 1
+rew=proficiencyBonus+4
+
+fail=2 if suc==1 else 1 if dc2 > two else 2
+total=rew if suc==1 else rew - 2
+
+a = load_json(bags)
+[a[x][1].update({"gp":a[x][1].gp+total}) for x in range(len(a)) if a[x][0] == 'Coin Pouch'][0]
+set_cvar("bags",dump_json(a))
+
+i = load_json(get_gvar("c7da8c4c-f030-4f2e-931d-cd8367bddc4b"))
+
+n = "\n"
+
+sMsg=f' -desc "You treat wounds, and cure diseases! (DC {dc1})\n**Medicine:** {one}\n\nYou stay healthy! (DC {dc2})\n**Constitution Save:** {two}\n\n{"You **failed!**" + n + "While working you catch a **" + str(i[randint(20)]) + "**!" if fail==1 else "**Success!** Everyone is happy with your service!" + n + "You gain **" + str(total) + "gp**" if suc==1 else "You are able to make it through the day without incident." + n + "You gain **" + str(total) + "gp**"}\n\n**DT Remaining:** "{cc_str("DT")}'
+
+ndMsg=f' -desc "{name} does not have the required downtime to perform this work."'
+
+hMsg=f' -desc "**HELP**\n\nPlease check downtime rules to set counters!"'
+
+return hMsg if h else ndMsg if nd else sMsg
+</drac2>
+-title "**<name>** starts their work as a Healer!"
+-footer "Downtime | Healer | Shadowprince#8900"
+-thumb <image>
+-color <color>
