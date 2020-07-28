@@ -22,4 +22,4 @@
 
 -title "**Downtime Activity: Saving the cat!**" 
 -desc "{{hMsg if h else ndMsg if nd else sMsg}}"
--footer "Downtime | Cat | ShadowPrince#8900"
+-footer "Downtime | Cat | Peripéteia"
