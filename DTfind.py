@@ -1,4 +1,4 @@
-!alias DTfind embed
+!servalias DTfind embed
 {{h,nd='%1%'.lower()=='help',get_cc('DT')==0}}
 {{mod_cc('DT', -1) if not (nd or h) else None}}
 {{args=&ARGS&}} 
@@ -14,4 +14,4 @@
 
 -title "**Downtime Activity: Find**" 
 -desc "{{hMsg if h else ndMsg if nd else sMsg}}"
--footer "Downtime | Find | ShadowPrince#8900"
+-footer "Downtime | Find | Peripéteia"
