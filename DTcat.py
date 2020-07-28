@@ -1,4 +1,4 @@
-!alias DTcat embed
+!servalias DTcat embed
 {{h,nd='%1%'.lower()=='help',get_cc('DT')==0}}
 {{mod_cc('DT', -1) if not (nd or h) else None}}
 {{args=&ARGS&}} 
