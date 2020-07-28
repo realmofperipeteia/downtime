@@ -1,4 +1,4 @@
-!alias DTmerch embed
+!servalias DTmerch embed
 <drac2>
 h,nd='%1%'.lower()=='help',get_cc('DT')<4
 args=&ARGS&
@@ -37,6 +37,6 @@ hMsg=f' -desc "**HELP**\n\nPlease check downtime rules to set counters!"'
 return hMsg if h else ndMsg if nd else sMsg
 </drac2>
 -title "**<name>** starts their work as a Merchant!"
--footer "Downtime | Merchant | Shadowprince#8900"
+-footer "Downtime | Merchant | Peripéteia"
 -thumb <image>
 -color <color>
