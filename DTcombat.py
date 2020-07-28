@@ -1,4 +1,4 @@
-!alias DTcombat embed
+!servalias DTcombat embed
 <drac2>
 h,nd='%1%'.lower()=='help',get_cc('DT')==0
 mod_cc('DT', -1) if not (nd or h) else None
