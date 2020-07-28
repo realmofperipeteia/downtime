@@ -1,4 +1,4 @@
-!alias DTscribe embed
+!servalias DTscribe embed
 <drac2>
 h,nd='%1%'.lower()=='help',get_cc('DT')==0
 mod_cc('DT', -1) if not (nd or h) else None
@@ -30,6 +30,6 @@ hMsg=f' -desc "**HELP**\n\nPlease check downtime rules to set counters!"'
 return hMsg if h else ndMsg if nd else sMsg
 </drac2>
 -title "**<name>** starts their job as a Scribe!"
--footer "Downtime | Scribe Work | Shadowprince#8900"
+-footer "Downtime | Scribe Work | Peripéteia"
 -thumb <image>
 -color <color>
