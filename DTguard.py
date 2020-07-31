@@ -1,31 +1,38 @@
 !servalias DTguard embed
 <drac2>
-h,nd='%1%'.lower()=='help',get_cc('DT')==0
-mod_cc('DT', -1) if not (nd or h) else None
-args=&ARGS&
+args,n=&ARGS&,"\n"
 
-one=get_raw().skills.perception+roll('1d20')
-two=get('charismaSave')+roll('1d20')
-dc=12
+C1=get_raw().skills.perception+roll('1d20')
+S1=get('charismaSave')+roll('1d20')
+DC=12
 
-suc=(0 if dc > one else 1) + (0 if dc > two else 1)
-rew=4+proficiencyBonus if suc==2 else 4
-
-total=0 if suc==0 else rew
+S=(0 if DC > C1 else 1)+(0 if DC > S1 else 1)
+R=proficiencyBonus+4 if S==2 else 4
+T=0 if S==0 else R
 
 a = load_json(bags)
-[a[x][1].update({"gp":a[x][1].gp+total}) for x in range(len(a)) if a[x][0] == 'Coin Pouch'][0]
+oldGP=[a[x][1].get("gp") for x in range(len(a)) if a[x][0] == 'Coin Pouch'][0]
+[a[x][1].update({"gp":a[x][1].gp+T}) for x in range(len(a)) if a[x][0] == 'Coin Pouch'][0]
 set_cvar("bags",dump_json(a))
+newGP=[a[x][1].get("gp") for x in range(len(a)) if a[x][0] == 'Coin Pouch'][0]
 
-n = "\n"
-
-sMsg=f' -desc "You keep a lookout for anyone in trouble! (DC {dc})\n**Perception:** {one}\n\nYour presence dissuades criminals, and makes everyone feel safe! (DC {dc})\n**Charisma Save:** {two}\n\n{"You **failed!**" + n + "The guard captain is not impressed!" if suc==0 else "**Success!** You kept the city safe!" + n + "You gain **" + str(total) + "gp**" if suc==2 else "You are able to make it through the day without incident." + n + "You gain **" + str(total) + "gp**"}\n\n**DT Remaining:** "{cc_str("DT")}'
-
-ndMsg=f' -desc "{name} does not have the required downtime to perform this work."'
-
-hMsg=f' -desc "**HELP**\n\nPlease check downtime rules to set counters!"'
-
-return hMsg if h else ndMsg if nd else sMsg
+if get_cc('DT')==0:
+	Msg = f' -desc "{name} does not have the required downtime."'
+else:
+	mod_cc('DT', -1) 
+	Msg = f""" -desc 
+	"
+	Keeping a lookout for anyone in trouble (DC {DC})
+	**Perception:** {C1}
+	
+	Dissuading criminals and being a presence (DC {DC})
+	**Charisma Save:** {S1}
+	
+	{"**Success** - you kept the city safe! :PandaHappy:" + n + "You gain **" + str(T) + "gp**" if S==2 else "An average day, just getting by." + n + "You gain **" + str(T) + "gp**" if S==1 else "The guard captain is not impressed. :PandaPopcorn:"}{n + "" if S==0 else n + n + "**Gold Pieces: **" + str(oldGP) + "gp -> " + str(newGP) + "gp"}
+	**DT Remaining:** {cc_str("DT")}
+	"
+	"""
+return Msg
 </drac2>
 -title "**<name>** starts their patrol as a City Guard!"
 -footer "Downtime | Guard | Peripéteia"
