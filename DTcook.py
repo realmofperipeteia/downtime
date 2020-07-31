@@ -1,35 +1,40 @@
-!alias DTcook embed
+!servalias DTcook embed
 <drac2>
-h,nd='%1%'.lower()=='help',get_cc('DT')==0
-mod_cc('DT', -1) if not (nd or h) else None
-args=&ARGS&
+args,n=&ARGS&,"\n"
 
-b=proficiencyBonus if "Cook's Utensils" in get("pTools","[]") else 0
-one=get_raw().skills.survival+roll('1d20')
-sur=one + b
-con=get('constitutionSave')+roll('1d20')
-dc=8
+B=proficiencyBonus if "Cook's Utensils" in get("pTools","[]") else 0
+C1=get_raw().skills.survival+roll('1d20')+B
+S1=get('constitutionSave')+roll('1d20')
+DC=8
 
-suc=0 if dc > sur else 1
-rew=proficiencyBonus+2
+S=0 if DC > C1 else 1
+R=proficiencyBonus+2
 
-fail=2 if suc==1 else 1 if dc > con else 2
-
-total=rew if suc==1 else rew - 2
+F=2 if S==1 else 1 if DC > S1 else 2
+T=R if S==1 else R - 2
 
 a = load_json(bags)
-[a[x][1].update({"gp":a[x][1].gp+total}) for x in range(len(a)) if a[x][0] == 'Coin Pouch'][0]
+oldGP=[a[x][1].get("gp") for x in range(len(a)) if a[x][0] == 'Coin Pouch'][0]
+[a[x][1].update({"gp":a[x][1].gp+T}) for x in range(len(a)) if a[x][0] == 'Coin Pouch'][0]
 set_cvar("bags",dump_json(a))
+newGP=[a[x][1].get("gp") for x in range(len(a)) if a[x][0] == 'Coin Pouch'][0]
 
-n = "\n"
-
-sMsg=f' -desc "You make a fabulous meal! (DC {dc})\n**Survival:** {sur}\n\nYou make sure it was cooked just right! (DC {dc})\n**Constitution Save:** {con}\n\n{"Unfortunately while working you get **food poisoning**!" if fail==1 else "**Success!** Everyone is happy with your service!" + n + "You gain **" + str(total) + "gp**" if suc==1 else "You are able to make it through the day without incident." + n + "You gain **" + str(total) + "gp**"}\n\n**DT Remaining:** "{cc_str("DT")}'
-
-ndMsg=f' -desc "{name} does not have the required downtime to perform this work."'
-
-hMsg=f' -desc "**HELP**\n\nPlease check downtime rules to set counters!"'
-
-return hMsg if h else ndMsg if nd else sMsg
+if get_cc('DT')==0:
+	Msg = f' -desc "{name} does not have the required downtime."'
+else:
+	mod_cc('DT', -1) 
+	Msg = f""" -desc 
+	"
+	Make a fabulous meal (DC {DC})
+	**Survival:** {C1}{n + n + "Taste testing (DC " + str(DC) + ")" + n + "**Constitution Save:** " + str(S1) if S==0 else ""}{n + n + "You get **food poisoning**! :PandaWorried:" if F==1 else ""}
+	
+	{"**Success** - everyone is happy with your service! :PandaHappy:" + n + "You gain **" + str(T) + "gp**" if S==1 else "Not your best day. :PandaPopcorn:" + n + "You gain **" + str(T) + "gp**"}
+	
+	{"**Gold Pieces: **" + str(oldGP) + "gp -> " + str(newGP) + "gp"}
+	**DT Remaining:** {cc_str("DT")}
+	"
+	"""
+return Msg
 </drac2>
 -title "**<name>** starts their job as a Cook!"
 -footer "Downtime | Cook | Peripéteia"
