@@ -1,35 +1,42 @@
 !servalias DTscribe embed
 <drac2>
-h,nd='%1%'.lower()=='help',get_cc('DT')==0
-mod_cc('DT', -1) if not (nd or h) else None
-args=&ARGS&
+args,n,p=&ARGS&,"\n",proficiencyBonus
 
-b=proficiencyBonus if "Calligrapher's Supplies" in get("pTools","[]") else 0
-mod=intelligenceMod+roll('1d20')
-one=mod + b
-two=get('intelligenceSave')+roll('1d20')
-dc=8
+B=proficiencyBonus if "Calligrapher's Supplies" in get("pTools","[]") else 0
+C1=intelligenceMod+roll('1d20')+B
+S1=get('intelligenceSave')+roll('1d20')
+DC=8
 
-suc=(0 if dc > one else 1)+(0 if dc > two else 1)
-rew=2+proficiencyBonus if suc==2 else proficiencyBonus
-
-total=0 if suc==0 else rew
+S=(0 if DC > C1 else 1)+(0 if DC > S1 else 1)
+R=2+p if S==2 else p
+T=0 if S==0 else R
 
 a = load_json(bags)
-[a[x][1].update({"gp":a[x][1].gp+total}) for x in range(len(a)) if a[x][0] == 'Coin Pouch'][0]
+oldGP=[a[x][1].get("gp") for x in range(len(a)) if a[x][0] == 'Coin Pouch'][0]
+[a[x][1].update({"gp":a[x][1].gp+T}) for x in range(len(a)) if a[x][0] == 'Coin Pouch'][0]
 set_cvar("bags",dump_json(a))
+newGP=[a[x][1].get("gp") for x in range(len(a)) if a[x][0] == 'Coin Pouch'][0]
 
-n = "\n"
-
-sMsg=f' -desc "You write down detailed pages and maps! (DC {dc})\n**Intelligence:** {one}\n\nYou power through the work with mental fortitude! (DC {dc})\n**Intelligence Save:** {two}\n\n{"**Success!** Everyone is happy with your service!" + n + "You gain **" + str(total) + "gp**" if suc==2 else "You are able to make it through the day." + n + "You gain **" + str(total) + "gp**" if suc==1 else "You **failed** and the work was not completed!"}\n\n**DT Remaining:** "{cc_str("DT")}'
-
-ndMsg=f' -desc "{name} does not have the required downtime to perform this work."'
-
-hMsg=f' -desc "**HELP**\n\nPlease check downtime rules to set counters!"'
-
-return hMsg if h else ndMsg if nd else sMsg
+if get_cc('DT')==0:
+	Msg = f' -desc "{name} does not have the required downtime."'
+else:
+	mod_cc('DT', -1) 
+	Msg = f""" -desc 
+	"
+	Writing detailed pages and maps (DC {DC})
+	**Intelligence:** {C1}
+	
+	Mental fortitude (DC {DC})
+	**Intelligence Save:** {S1}
+	
+	{"**Success** - everyone is happy with your service! :PandaHappy:" + n + "You gain **" + str(T) + "gp**" if S==2 else "Made it through the day." + n + "You gain **" + str(T) + "gp**" if S==1 else "The work was not completed. :PandaPopcorn:"}
+	{"" if S==0 else n + "**Gold Pieces: **" + str(oldGP) + "gp -> " + str(newGP) + "gp"}
+	**DT Remaining:** {cc_str("DT")}
+	"
+	"""
+return Msg
 </drac2>
--title "**<name>** starts their job as a Scribe!"
--footer "Downtime | Scribe Work | Peripéteia"
+-title "**<name>** starts work as a Scribe!"
+-footer "Downtime | Scribe | Peripéteia"
 -thumb <image>
 -color <color>
