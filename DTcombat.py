@@ -1,30 +1,40 @@
 !servalias DTcombat embed
 <drac2>
-h,nd='%1%'.lower()=='help',get_cc('DT')==0
-mod_cc('DT', -1) if not (nd or h) else None
-args=&ARGS&
+args,n,p,e=&ARGS&,"\n",proficiencyBonus,"Experience"
 
-one=max(dexterityMod,strengthMod)+proficiencyBonus+roll('1d20')
-two=get_raw().skills.acrobatics+roll('1d20')
-dex=get('dexteritySave')+roll('1d20')
-dc=12
-suc=0 if dc > one else 1
-fail=1 if dc > two else 0
-fate=(1 if fail==1 else 0) + (1 if dc > dex else 0)
-rew=roll('4d8')
-total=rew * proficiencyBonus if suc==1 else 0
-mod_cc("Experience",total)
+C1=max(dexterityMod,strengthMod)+p+roll('1d20')
+C2=get_raw().skills.acrobatics+roll('1d20')
+S1=get('dexteritySave')+roll('1d20')
+DC=12
+S=0 if DC > C1 else 1
+F1=1 if DC > C2 else 0
+F2=(1 if F1==1 else 0) + (1 if DC > S1 else 0)
+R=roll('4d8')
+T=R * p if S==1 else 0
 
 i = load_json(get_gvar("f688fe2b-5057-4900-beaa-e75121489e46"))
-n = "\n"
+oldXP=get_cc(e)
+mod_cc(e,T)
+newXP=get_cc(e)
 
-sMsg=f' -desc "You make an attack! (DC {dc})\n**Attack:** {one}\n\nYou dodge the obstacles! (DC {dc})\n**Acrobatics:** {two}\n\n{"You encounter difficulties! (DC " + str(dc) + ")" + n + "**Dexterity save: **" + str(dex) + n + n if fail==1 else ""}{"**Success!** You completed the training!" + n + "You gain **" + str(total) + "xp**" if suc==1 else "Further training is needed"}{n + n + "While training you get injured! You now have a **" + str(i[randint(20)]) + "**" if fate==2 else ""}\n\n**Current Experience:** "{cc_str("Experience")}"\n**DT Remaining:** "{cc_str("DT")}'
-
-ndMsg=f' -desc "{name} does not have the required downtime to perform this work."'
-
-hMsg=f' -desc"**HELP**\n\nPlease check downtime rules to set counters!"'
-
-return hMsg if h else ndMsg if nd else sMsg
+if get_cc('DT')==0:
+	Msg = f' -desc "{name} does not have the required downtime."'
+else:
+	mod_cc('DT', -1) 
+	Msg = f""" -desc 
+	"
+	Dodging the obstacles (DC {DC})
+	**Acrobatics:** {C2}{n + n + "Encountering difficulties (DC " + str(DC) + ")" + n + "**Dexterity Save:** " + str(S1) if F1==1 else ""}{n + n + "While training you get injured!" + n +"You now have a **" + str(i[randint(20)]) + "** :PandaWorried:" if F2==2 else ""}
+	
+	Attacking the targets (DC {DC})
+	**Attack:** {C1}
+	
+	{"**Success** - you completed the training! :PandaHappy:" + n + "You gain **" + str(T) + "xp**" if S==1 else "Further training is needed. :PandaPopcorn:"}
+	{n + "**Experience: **" + n + str(oldXP) + "xp -> " + str(newXP) + "xp" if S==1 else ""}
+	**DT Remaining:** {cc_str("DT")}
+	"
+	"""
+return Msg
 </drac2>
 -title "**<name>** begins combat training!"
 -footer "Downtime | Training | Peripéteia"
