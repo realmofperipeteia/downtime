@@ -1,33 +1,39 @@
 !servalias DTperform embed
 <drac2>
-h,nd='%1%'.lower()=='help',get_cc('DT')==0
-mod_cc('DT', -1) if not (nd or h) else None
-args=&ARGS&
+args,n,p=&ARGS&,"\n",proficiencyBonus
 
-one = get_raw().skills.insight+roll('1d20')
-two = get_raw().skills.performance+roll('1d20')
+C1=get_raw().skills.insight+roll('1d20')
+C2=get_raw().skills.performance+roll('1d20')
+DC1,DC2=roll('2d4+7'),roll('2d4+7')
 
-dc1=roll('2d4+7')
-dc2=roll('2d4+7')
-
-suc=1 + (0 if dc1 > one else 1) + (0 if dc2 > two else 1)
-
-rew=proficiencyBonus + roll('1d6') if suc==3 else roll('1d6')
-total=0 if suc==1 else rew
+S=1 + (0 if DC1 > C1 else 1) + (0 if DC2 > C2 else 1)
+R=p + roll('1d6') if S==3 else p
+T=0 if S==1 else R
 
 a = load_json(bags)
-[a[x][1].update({"gp":a[x][1].gp+total}) for x in range(len(a)) if a[x][0] == 'Coin Pouch'][0]
+oldGP=[a[x][1].get("gp") for x in range(len(a)) if a[x][0] == 'Coin Pouch'][0]
+[a[x][1].update({"gp":a[x][1].gp+T}) for x in range(len(a)) if a[x][0] == 'Coin Pouch'][0]
 set_cvar("bags",dump_json(a))
+newGP=[a[x][1].get("gp") for x in range(len(a)) if a[x][0] == 'Coin Pouch'][0]
 
-n = "\n"
-
-sMsg=f' -desc "You read the audience! (DC {dc1})\n**Insight:** {one}\n\nYou put on a performance! (DC {dc2})\n**Performance:** {two}\n\n{"You **failed** and your performance was not entertaining." if suc==1 else "**Success!** The crowd absolutely loves your performance!" + n + "You gain **" + str(total) + "gp**"}\n\n**DT Remaining:** "{cc_str("DT")}'
-
-ndMsg=f' -desc "{name} does not have the required downtime to perform this work."'
-
-hMsg=f' -desc "**HELP**\n\nPlease check downtime rules to set counters!"'
-
-return hMsg if h else ndMsg if nd else sMsg
+if get_cc('DT')==0:
+	Msg = f' -desc "{name} does not have the required downtime."'
+else:
+	mod_cc('DT', -1) 
+	Msg = f""" -desc 
+	"
+	Reading the audience (DC {DC1})
+	**Insight:** {C1}
+	
+	Putting on a performance (DC {DC2})
+	**Performance:** {C2}
+	
+	{"**Success** - the crowd loves your performance! :PandaHappy:" + n + "You gain **" + str(T) + "gp**" if S==3 else "Made it through the day." + n + "You gain **" + str(T) + "gp**" if S==2 else "Nobody was impressed. :PandaPopcorn:"}
+	{"" if S==1 else n + "**Gold Pieces: **" + str(oldGP) + "gp -> " + str(newGP) + "gp"}
+	**DT Remaining:** {cc_str("DT")}
+	"
+	"""
+return Msg
 </drac2>
 -title "**<name>** attempts to put on a show!"
 -footer "Downtime | Perform | Peripéteia"
