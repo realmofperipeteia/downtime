@@ -1,17 +1,44 @@
 !servalias DTfind embed
-{{h,nd='%1%'.lower()=='help',get_cc('DT')==0}}
-{{mod_cc('DT', -1) if not (nd or h) else None}}
-{{args=&ARGS&}} 
+<drac2>
+args,n= &ARGS&,"\n"
 
-{{one=max(get_raw().skills.persuasion,get_raw().skills.investigation)+roll('1d20')}}
-{{dc=roll('2d4+3')}}{{suc=(0 if dc > one else 1)}}{{job="%1%"}}
+C1=max(get_raw().skills.persuasion,get_raw().skills.investigation)+roll('1d20')
+DC=roll('2d4+3')
+S=(0 if DC > C1 else 1)
+J=["cook", "scribe", "healer", "guard", "performer"]
 
-{{sMsg=f"**{name}** looks for work around town!\n\nYou ask around the city! (DC {dc})\n**Check:** {one}\n\n{'**Success!** You find a new job as a **' + str(job) + '**!' if suc==1 else 'Unfortunately you were unable to find a job this time.'}\n\n**DT Remaining:** {cc_str('DT')}"}}
+eM=f""" -desc 
+"
+**Command:**
+`!DTfind [Job]`
 
-{{ndMsg=f"{name} does not have the required downtime to perform this work."}}
+**Jobs**
+Cook, Scribe, Healer, Guard, Performer
+"
+"""
 
-{{hMsg=f"**HELP**\n\nPlease check downtime rules to set counters!\nRemember to say what work you are looking for!"}}
+if get_cc('DT') > 0:
+	if len(&ARGS&)==1:
+		if '&1&'.lower() in J:
+			j = '&1&'
+			mod_cc('DT', -1) 
+			Msg=f""" -desc 
+			"
+			You found a job as a **{j}**! :PandaHappy:
+			
+			**DT Remaining:** {cc_str("DT")}
+			"
+			"""
+		else:
+			Msg=eM
+	else:
+		Msg=eM
+else:
+	Msg=f' -desc "{name} does not have the required downtime."'
 
--title "**Downtime Activity: Find**" 
--desc "{{hMsg if h else ndMsg if nd else sMsg}}"
+return Msg
+</drac2>
+-title "**<name>** looks around the city!"
 -footer "Downtime | Find | Peripéteia"
+-thumb <image>
+-color <color>
