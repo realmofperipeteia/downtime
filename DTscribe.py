@@ -2,7 +2,7 @@
 <drac2>
 args,n,p=&ARGS&,"\n",proficiencyBonus
 
-B=proficiencyBonus if "Calligrapher's Supplies" in get("pTools","[]") else 0
+B=p if "Calligrapher's Supplies" in get("pTools","[]") else 0
 C1=intelligenceMod+roll('1d20')+B
 S1=get('intelligenceSave')+roll('1d20')
 DC=8
