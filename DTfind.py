@@ -3,7 +3,7 @@
 args,n= &ARGS&,"\n"
 
 C1=max(get_raw().skills.persuasion,get_raw().skills.investigation)+roll('1d20')
-DC=roll('2d4+3')
+DC=roll('2d4+5')
 S=(0 if DC > C1 else 1)
 J=["cook", "scribe", "healer", "guard", "performer"]
 
@@ -24,7 +24,10 @@ if get_cc('DT') > 0:
 			mod_cc('DT', -1) 
 			Msg=f""" -desc 
 			"
-			You found a job as a **{j}**! :PandaHappy:
+			Asking around (DC {DC})
+			**Check:** {C1}
+			
+			{"**Success** - you found a job as a **" + str(j) + "**! :PandaHappy:" if S==1 else "Unfortunately you were unable to find a job this time. :PandaWorried:"}
 			
 			**DT Remaining:** {cc_str("DT")}
 			"
